@@ -1,13 +1,16 @@
 package com.profileDev.profileDev.controller;
 
 
+import com.profileDev.profileDev.Auditing.ProfileDtoAuditing;
 import com.profileDev.profileDev.Configuration.CustomControllerAdvice;
 import com.profileDev.profileDev.Exceptions.ControllerException;
 import com.profileDev.profileDev.Exceptions.ServiceException;
 import com.profileDev.profileDev.ProfileDevApplication;
 import com.profileDev.profileDev.dto.CredentialDTO;
 import com.profileDev.profileDev.dto.ProfileDTO;
+import com.profileDev.profileDev.dto.ProfileDevAuditDTO;
 import com.profileDev.profileDev.dto.ProfileImgDTO;
+import com.profileDev.profileDev.email.EmailServiceImpl;
 import com.profileDev.profileDev.entity.Credential;
 import com.profileDev.profileDev.service.ProfileDevService;
 import org.slf4j.Logger;
@@ -24,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
@@ -38,6 +42,8 @@ public class ProfileDevController {
     public ProfileDevService profileDevService;
     @Autowired
     public CustomControllerAdvice customControllerAdvice;               //need to be Autowired to make CustomControllerAdvice workable
+    @Autowired
+    public EmailServiceImpl emailService;
 
     @GetMapping("/gettest")
     public String gettest(HttpServletRequest httpServletRequest){
@@ -139,6 +145,12 @@ public class ProfileDevController {
     public List<Credential> findAllCredsSortedByRole(@PathVariable String profileRole, HttpServletRequest httpServletRequest) {
         logger.info("## URL \"localhost:8080/Profile/findAllCredsSortedByRole/profileRole\" is hit by this system : ipaddress : "+httpServletRequest.getRemoteHost()+" ## user : "+httpServletRequest.getRemoteUser());
         return profileDevService.findAllCredsSortedByRole();
+    }
+
+    @GetMapping("/sendAuditMail")
+    public List<ProfileDevAuditDTO> sendAuditMail(@RequestParam("toMailId") String toMailId, @RequestParam("subject") String subject, @RequestParam("filePresent") String filePresent, HttpServletRequest httpServletRequest) throws MessagingException, IOException {
+        logger.info("## URL \"localhost:8080/Profile/sendAuditMail\" is hit by this system : ipaddress : "+httpServletRequest.getRemoteHost()+" ## user : "+httpServletRequest.getRemoteUser());
+        return emailService.sendAuditMail(toMailId,subject,filePresent);
     }
 
 }
