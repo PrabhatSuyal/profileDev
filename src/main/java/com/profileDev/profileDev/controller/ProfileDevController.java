@@ -1,26 +1,23 @@
 package com.profileDev.profileDev.controller;
 
 
-import com.profileDev.profileDev.Auditing.ProfileDtoAuditing;
 import com.profileDev.profileDev.Configuration.CustomControllerAdvice;
 import com.profileDev.profileDev.Exceptions.ControllerException;
 import com.profileDev.profileDev.Exceptions.ServiceException;
-import com.profileDev.profileDev.ProfileDevApplication;
 import com.profileDev.profileDev.dto.CredentialDTO;
 import com.profileDev.profileDev.dto.ProfileDTO;
 import com.profileDev.profileDev.dto.ProfileDevAuditDTO;
 import com.profileDev.profileDev.dto.ProfileImgDTO;
 import com.profileDev.profileDev.email.EmailServiceImpl;
 import com.profileDev.profileDev.entity.Credential;
+import com.profileDev.profileDev.entity.EnumCredential;
 import com.profileDev.profileDev.service.ProfileDevService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 @RestController
@@ -46,8 +45,13 @@ public class ProfileDevController {
     public EmailServiceImpl emailService;
 
     @GetMapping("/gettest")
-    public String gettest(HttpServletRequest httpServletRequest){
+    public String gettest(){
         return profileDevService.gettest();
+    }
+
+    @GetMapping("/getEnum")
+    public List<EnumCredential> getEnum(){
+        return new ArrayList<EnumCredential>(EnumSet.allOf(EnumCredential.class));
     }
 
     @PostMapping("/createProfile")
