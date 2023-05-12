@@ -2,6 +2,7 @@ package com.profileDev.profileDev.service;
 
 
 import com.profileDev.profileDev.Auditing.ProfileDtoAuditing;
+import com.profileDev.profileDev.Auditing.ProfileDtoAuditingRepository;
 import com.profileDev.profileDev.Configuration.FileCompressor;
 import com.profileDev.profileDev.Exceptions.ServiceException;
 import com.profileDev.profileDev.dto.CredentialDTO;
@@ -10,22 +11,18 @@ import com.profileDev.profileDev.dto.ProfileImgDTO;
 import com.profileDev.profileDev.entity.Credential;
 import com.profileDev.profileDev.entity.ProfileImg;
 import com.profileDev.profileDev.repository.CredentialRepository;
-import com.profileDev.profileDev.Auditing.ProfileDtoAuditingRepository;
 import com.profileDev.profileDev.repository.ProfileImgRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 @Service
@@ -49,6 +46,7 @@ public class ProfileDevService {
     private RabbitTemplate rabbitTemplate;
     //@Autowired
     //private KafkaTemplate<String, String> kafkaTemplate;
+
 
     public String gettest() {
         return " exc is : "+env.getProperty("RMQ.Exchange.Excahange1")+" key is : "+env.getProperty("RMQ.Key.Key1");
@@ -83,7 +81,7 @@ public class ProfileDevService {
         //return modelMapper.map(credentialRepository.findByName(profileName), CredentialDTO.class);
         if(profileName.isEmpty() || profileName.length()==0) {throw new ServiceException("601", "name cant be empty. provide a name.");}
         try{
-            System.out.println("### inside try");
+            System.out.println("### inside try service");
             return modelMapper.map(credentialRepository.findByName(profileName), CredentialDTO.class);
         }catch (IllegalArgumentException e){      //illegal args excep is used bcoz of error "source cannot be null" of ModelMapper
             System.out.println("### 602");
