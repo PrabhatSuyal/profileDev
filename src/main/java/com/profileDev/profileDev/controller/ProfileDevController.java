@@ -20,7 +20,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -77,7 +76,7 @@ public class ProfileDevController {
 
     @GetMapping("/deleteProfilesInCache")
     @CacheEvict("ProfileCache")
-    @Scheduled(fixedRateString = "${caching.spring.hotelListTTL}")
+    //@Scheduled(fixedRateString = "${caching.spring.hotelListTTL}")
     public List<CredentialDTO> deleteProfilesInCache(HttpServletRequest httpServletRequest){
         //logger.info("## URL \"localhost:8080/Profile/deleteProfilesInCache\" is hit by this system : ipaddress : "+httpServletRequest.getRemoteHost()+" ## user : "+httpServletRequest.getRemoteUser());
         return profileDevService.getProfiles();
