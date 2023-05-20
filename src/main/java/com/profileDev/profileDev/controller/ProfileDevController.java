@@ -4,6 +4,7 @@ package com.profileDev.profileDev.controller;
 import com.profileDev.profileDev.Configuration.CustomControllerAdvice;
 import com.profileDev.profileDev.Exceptions.ControllerException;
 import com.profileDev.profileDev.Exceptions.ServiceException;
+import com.profileDev.profileDev.FileManagement.ExcelGenerator;
 import com.profileDev.profileDev.dto.CredentialDTO;
 import com.profileDev.profileDev.dto.ProfileDTO;
 import com.profileDev.profileDev.dto.ProfileDevAuditDTO;
@@ -18,13 +19,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -42,6 +48,8 @@ public class ProfileDevController {
     public CustomControllerAdvice customControllerAdvice;          //need to be Autowired to make CustomControllerAdvice workable
     @Autowired
     public EmailServiceImpl emailService;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @GetMapping("/gettest")
     public String gettest(){
@@ -76,7 +84,7 @@ public class ProfileDevController {
 
     @GetMapping("/deleteProfilesInCache")
     @CacheEvict("ProfileCache")
-    //@Scheduled(fixedRateString = "${caching.spring.hotelListTTL}")
+    //@Scheduled(fixedRateString = "${caching.spring.hotelListTTL}")        //not working properly with controller class so scheduled from separate class
     public List<CredentialDTO> deleteProfilesInCache(HttpServletRequest httpServletRequest){
         //logger.info("## URL \"localhost:8080/Profile/deleteProfilesInCache\" is hit by this system : ipaddress : "+httpServletRequest.getRemoteHost()+" ## user : "+httpServletRequest.getRemoteUser());
         return profileDevService.getProfiles();
@@ -155,5 +163,34 @@ public class ProfileDevController {
         //logger.info("## URL \"localhost:8080/Profile/sendAuditMail\" is hit by this system : ipaddress : "+httpServletRequest.getRemoteHost()+" ## user : "+httpServletRequest.getRemoteUser());
         return emailService.sendAuditMail(toMailId,subject,filePresent);
     }
+
+    @GetMapping("/thirdPartyAPI")
+    protected ResponseEntity<String> thirdPartyAPI(@RequestParam String endPoint) {
+        String url = "http://localhost:8080/Profile/"+endPoint;
+        String user = SecurityContextHolder.getContext().getAuthentication().getName();
+        String password = "admin";//String password = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials(); //getting nul bcoz after successfull login spring rmoves the pwds
+        //logger.info("## URL \"localhost:8080/Profile/thirdPartyAPI\" is hit : "+endPoint+" : user : "+user+" pwd : "+password);
+        boolean bool = restTemplate.getInterceptors().add( new BasicAuthenticationInterceptor(user, password));
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET,null,String.class);
+        return response;
+    }
+
+    @GetMapping("/exportProfilesToExcel")
+    public List<CredentialDTO> exportProfilesToExcel(HttpServletResponse httpServletResponse) throws IOException{
+        List<CredentialDTO> credsList = profileDevService.getProfiles();
+
+        /*DateFormat dateFormat = new SimpleDateFormat("ssmmHH_ddMMyyyy");
+        String currentDate = dateFormat.format(new Date());
+        httpServletResponse.setContentType("application/octet-stream");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=student" + currentDate + ".xlsx";
+        httpServletResponse.setHeader(headerKey, headerValue);*/
+
+        ExcelGenerator generator = new ExcelGenerator(credsList);
+        generator.generateExcelFile(httpServletResponse);
+        return credsList;
+    }
+
+
 
 }

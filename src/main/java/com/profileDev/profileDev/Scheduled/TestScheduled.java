@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestScheduled {// need to create component of scheduled task separately bcoz it is giving warning with rest controller class
 
-    @Scheduled(fixedRateString = "10000")
+    @Scheduled(fixedRateString = "30000")
     @CacheEvict("ProfileCache")
     public void deleteProfilesInCache1(){
         System.out.println("TestScheduled >> .deleteProfilesInCache1()");
