@@ -2,6 +2,7 @@ package com.profileDev.profileDev.FileManagement;
 
 import com.profileDev.profileDev.controller.ProfileDevController;
 import com.profileDev.profileDev.dto.CredentialDTO;
+import lombok.NoArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -10,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
@@ -18,6 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+@Component
+@NoArgsConstructor
 public class ExcelGenerator {
 
     Logger logger = LoggerFactory.getLogger(ProfileDevController.class);
@@ -25,13 +29,17 @@ public class ExcelGenerator {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
 
-    public ExcelGenerator(List < CredentialDTO > credentialDTOList) {
+    /*public ExcelGenerator(List < CredentialDTO > credentialDTOList) {
+        this.credentialDTOList = credentialDTOList;
+        workbook = new XSSFWorkbook();
+        logger.info("ExcelGenerator >> ExcelGenerator()");
+    }*/
+
+    public void generator1(List < CredentialDTO > credentialDTOList) {
         this.credentialDTOList = credentialDTOList;
         workbook = new XSSFWorkbook();
         logger.info("ExcelGenerator >> ExcelGenerator()");
     }
-
-
 
     public void generateExcelFile(HttpServletResponse httpServletResponse) throws IOException {
         writeHeader();

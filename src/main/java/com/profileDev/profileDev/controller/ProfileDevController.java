@@ -51,6 +51,9 @@ public class ProfileDevController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    ExcelGenerator generator1;
+
     @GetMapping("/gettest")
     public String gettest(){
         return profileDevService.gettest();
@@ -186,8 +189,10 @@ public class ProfileDevController {
         String headerValue = "attachment; filename=student" + currentDate + ".xlsx";
         httpServletResponse.setHeader(headerKey, headerValue);*/
 
-        ExcelGenerator generator = new ExcelGenerator(credsList);
-        generator.generateExcelFile(httpServletResponse);
+        //ExcelGenerator generator = new ExcelGenerator(credsList);
+        //generator.generateExcelFile(httpServletResponse);
+        generator1.generator1(credsList);
+        generator1.generateExcelFile(httpServletResponse);
         return credsList;
     }
 
